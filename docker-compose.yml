@@ -1,0 +1,102 @@
+services:
+
+  # Minio Storage Server
+  minio:
+    image: minio/minio:latest
+    container_name: storage
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DOMAIN=storage
+      - MINIO_REGION_NAME=us-east-1
+      - MINIO_REGION=us-east-1
+    networks:
+      - dremio-laptop-lakehouse
+    ports:
+      - 9001:9001
+      - 9000:9000
+    command: [ "server", "/data", "--console-address", ":9001" ]
+
+  minio-setup:
+    image: alpine/curl
+    container_name: minio-setup
+    environment:
+      - RETRY_COUNT=12 # number of retries for health checks
+      - MINIO_HEALTH_URL=http://minio:9000/minio/health/live
+      - SLEEP_INTERVAL=5 # Sleep duration in seconds between retries
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    depends_on:
+      minio:
+        condition: service_started
+        restart: true
+    volumes:
+    - ./create_minio_bucket.sh:/create_minio_bucket.sh
+    command: sh /create_minio_bucket.sh
+    networks:
+      - dremio-laptop-lakehouse
+
+  # Dremio
+  dremio:
+    platform: linux/x86_64
+    image: dremio/dremio-oss:latest
+    ports:
+    - 9047:9047
+    - 31010:31010
+    - 32010:32010
+    - 45678:45678
+    container_name: dremio-analytics
+    environment:
+    - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist -Ddebug.addDefaultUser=true
+    - DREMIO_MAX_MEMORY_SIZE_MB=4096
+    - DREMIO_MAX_DIRECT_MEMORY_SIZE_MB=4096
+    - SERVICES_COORDINATOR_ENABLED=true
+    - SERVICES_EXECUTOR_ENABLED=true
+    depends_on:
+      minio-setup:
+        condition: service_started
+    networks:
+    - dremio-laptop-lakehouse
+
+  dremio-setup:
+    image: ubuntu:latest
+    container_name: dremio-setup
+    environment:
+    - RETRY_COUNT=12 # number of retries for health checks
+    - DREMIO_HEALTH_URL=http://dremio:9047
+    - SLEEP_INTERVAL=5 # Sleep duration in seconds between retries
+    - DREMIO_SOFTWARE_USERNAME=dremio
+    - DREMIO_SOFTWARE_PASSWORD=dremio123
+    - MINIO_ROOT_USER=admin
+    - MINIO_ROOT_PASSWORD=password
+    depends_on:
+      dremio:
+        condition: service_started
+        restart: true
+    volumes:
+    - ./dremio-setup.sh:/dremio-setup.sh
+    command: sh /dremio-setup.sh
+    networks:
+    - dremio-laptop-lakehouse
+
+  # Main container with dbt project
+  dbt:
+    image: python:3.9-slim
+    container_name: dbt
+    environment:
+    - DBT_PROFILES_DIR=/usr/src/app/
+#    volumes:
+#    - .:/usr/src/app:rw
+#    - dremio_data:/mnt/dremio_data:rw
+    working_dir: /usr/src/app
+    command: /bin/bash -c "apt-get update && apt-get install -y git curl && pip install protobuf==4.21 dbt-core==1.8.8 dbt-dremio==1.8.1 && tail -f /dev/null && /bin/bash"
+    tty: true
+    networks:
+    - dremio-laptop-lakehouse
+    depends_on:
+      dremio-setup:
+        condition: service_started
+
+networks:
+  dremio-laptop-lakehouse:
+
