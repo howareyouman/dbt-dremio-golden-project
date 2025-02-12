@@ -46,6 +46,14 @@ fi
 
 echo "Obtained Dremio auth token."
 
+echo "Create Jaffle space"
+curl "http://dremio:9047/api/v3/catalog" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: _dremio$AUTH_TOKEN" \
+  --data-raw "{\"name\":\"jaffle\",\"entityType\":\"space\"}"
+
+echo "Space created"
+
 # Create the S3 source in Dremio
 echo "Creating the S3 source in Dremio..."
 curl -s -X PUT "http://dremio:9047/apiv2/source/dbt_test_source" \

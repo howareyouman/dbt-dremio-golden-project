@@ -20,6 +20,9 @@ clean-targets:
 require-dbt-version: [">=1.0.0", "<2.0.0"]
 
 models:
+  +persist_docs:
+    relation: true
+    columns: true
   jaffle_shop:
       materialized: table
       staging:

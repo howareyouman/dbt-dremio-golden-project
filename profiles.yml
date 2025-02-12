@@ -1,7 +1,7 @@
 jaffle_shop:
   outputs:
     dev:
-      dremio_space: '@user'
+      dremio_space: 'jaffle'
       dremio_space_folder: no_schema
       object_storage_path: dbtdremios3
       object_storage_source: dbt_test_source
