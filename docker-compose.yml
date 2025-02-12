@@ -69,6 +69,9 @@ services:
     - DREMIO_SOFTWARE_PASSWORD=dremio123
     - MINIO_ROOT_USER=admin
     - MINIO_ROOT_PASSWORD=password
+    - POSTGRES_USER=dremio
+    - POSTGRES_PASSWORD=dremio123
+    - POSTGRES_DB=store
     depends_on:
       dremio:
         condition: service_started
@@ -85,9 +88,9 @@ services:
     container_name: dbt
     environment:
     - DBT_PROFILES_DIR=/usr/src/app/
-#    volumes:
-#    - .:/usr/src/app:rw
-#    - dremio_data:/mnt/dremio_data:rw
+    volumes:
+      - .:/usr/src/app:rw
+      - dremio_data:/mnt/dremio_data:rw
     working_dir: /usr/src/app
     command: /bin/bash -c "apt-get update && apt-get install -y git curl && pip install protobuf==4.21 dbt-core==1.8.8 dbt-dremio==1.8.1 && tail -f /dev/null && /bin/bash"
     tty: true
@@ -97,6 +100,27 @@ services:
       dremio-setup:
         condition: service_started
 
+  postgres:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=dremio
+      - POSTGRES_PASSWORD=dremio123
+      - POSTGRES_DB=store
+    ports:
+      - 5432:5432
+    networks:
+      - dremio-laptop-lakehouse
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./seeds/raw_customers.csv:/docker-entrypoint-initdb.d/raw_customers.csv
+      - ./seeds/raw_orders.csv:/docker-entrypoint-initdb.d/raw_orders.csv
+      - ./seeds/raw_payments.csv:/docker-entrypoint-initdb.d/raw_payments.csv
+
 networks:
   dremio-laptop-lakehouse:
+
+volumes:
+  dremio_data:
+  minio_data:
 

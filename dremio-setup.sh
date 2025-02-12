@@ -8,6 +8,9 @@ set -e
 : "${DREMIO_SOFTWARE_PASSWORD:?Need to set DREMIO_SOFTWARE_PASSWORD}"
 : "${MINIO_ROOT_USER:?Need to set MINIO_ROOT_USER}"
 : "${MINIO_ROOT_PASSWORD:?Need to set MINIO_ROOT_PASSWORD}"
+: "${POSTGRES_DB:?Need to set POSTGRES_DB}"
+: "${POSTGRES_USER:?Need to set POSTGRES_USER}"
+: "${POSTGRES_PASSWORD:?Need to set POSTGRES_PASSWORD}"
 
 echo "Creating Dremio S3 Source..."
 
@@ -59,6 +62,15 @@ curl -s -X PUT  "http://dremio:9047/apiv2/source/Samples" \
   --data-raw "{\"name\":\"Samples\",\"config\":{\"externalBucketList\":[\"samples.dremio.com\"],\"credentialType\":\"NONE\",\"secure\":false,\"propertyList\":[]},\"name\":\"Samples\",\"accelerationRefreshPeriod\":3600000,\"accelerationGracePeriod\":10800000,\"accelerationNeverRefresh\":true,\"accelerationNeverExpire\":true,\"accelerationActivePolicyType\":\"PERIOD\",\"accelerationRefreshSchedule\":\"0 0 8 * * *\",\"accelerationRefreshOnDataChanges\":false,\"type\":\"S3\"}"
 
 echo "Samples source created in Dremio."
+
+
+echo "Creating the Postgres source in Dremio..."
+curl -s -X PUT "http://dremio:9047/apiv2/source/jaffle_shop" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: _dremio$AUTH_TOKEN" \
+  --data-raw "{\"config\":{\"username\":\"dremio\",\"password\":\"dremio123\",\"hostname\":\"postgres-db\",\"port\":\"5432\",\"databaseName\":\"store\",\"authenticationType\":\"MASTER\",\"fetchSize\":200,\"maxIdleConns\":8,\"idleTimeSec\":60,\"encryptionValidationMode\":\"CERTIFICATE_AND_HOSTNAME_VALIDATION\",\"propertyList\":[]},\"name\":\"jaffle_shop\",\"accelerationRefreshPeriod\":3600000,\"accelerationGracePeriod\":10800000,\"accelerationActivePolicyType\":\"PERIOD\",\"accelerationRefreshSchedule\":\"0 0 8 * * *\",\"accelerationRefreshOnDataChanges\":false,\"metadataPolicy\":{\"deleteUnavailableDatasets\":true,\"namesRefreshMillis\":3600000,\"datasetDefinitionRefreshAfterMillis\":3600000,\"datasetDefinitionExpireAfterMillis\":10800000,\"authTTLMillis\":86400000,\"updateMode\":\"PREFETCH_QUERIED\"},\"type\":\"POSTGRES\",\"accessControlList\":{\"userControls\":[],\"roleControls\":[]}}"
+
+echo "Postgres source created in Dremio."
 
 echo "Formatting SF_incidents2016..."
 curl -s -X PUT "http://dremio:9047/apiv2/source/Samples/file_format/samples.dremio.com/SF_incidents2016.json" \
