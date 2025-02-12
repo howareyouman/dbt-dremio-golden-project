@@ -116,8 +116,12 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./seeds/raw_customers.csv:/docker-entrypoint-initdb.d/raw_customers.csv
+      - ./seeds/raw_items.csv:/docker-entrypoint-initdb.d/raw_items.csv
       - ./seeds/raw_orders.csv:/docker-entrypoint-initdb.d/raw_orders.csv
       - ./seeds/raw_payments.csv:/docker-entrypoint-initdb.d/raw_payments.csv
+      - ./seeds/raw_products.csv:/docker-entrypoint-initdb.d/raw_products.csv
+      - ./seeds/raw_stores.csv:/docker-entrypoint-initdb.d/raw_stores.csv
+      - ./seeds/raw_supplies.csv:/docker-entrypoint-initdb.d/raw_supplies.csv
 
 networks:
   dremio-laptop-lakehouse:

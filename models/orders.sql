@@ -2,13 +2,23 @@
 
 with orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select
+        id as order_id,
+        customer as customer_id,
+        ordered_at as order_date,
+        status
+    from {{ ref('stg_orders') }}
 
 ),
 
 payments as (
 
-    select * from {{ ref('stg_payments') }}
+    select
+        id as payment_id,
+        order_id,
+        payment_method,
+        amount
+    from {{ ref('stg_payments') }}
 
 ),
 
@@ -46,7 +56,6 @@ final as (
         order_payments.total_amount as amount
 
     from orders
-
 
     left join order_payments
         on orders.order_id = order_payments.order_id

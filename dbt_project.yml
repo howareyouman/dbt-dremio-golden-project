@@ -19,6 +19,9 @@ clean-targets:
 
 require-dbt-version: [">=1.0.0", "<2.0.0"]
 
+vars:
+  truncate_timespan_to: "{{ current_timestamp() }}"
+
 models:
   +persist_docs:
     relation: true
