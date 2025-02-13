@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from "jaffle_shop".public.stores
+    select * from {{ source('jaffle_shop', 'stores') }}
 
     -- if you generate a larger dataset,
     -- you can limit the timespan to the current time with the following line

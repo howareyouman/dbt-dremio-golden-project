@@ -3,10 +3,9 @@
 with orders as (
 
     select
-        id as order_id,
-        customer as customer_id,
-        ordered_at as order_date,
-        status
+        order_id,
+        customer_id,
+        ordered_at as order_date
     from {{ ref('stg_orders') }}
 
 ),
@@ -14,7 +13,7 @@ with orders as (
 payments as (
 
     select
-        id as payment_id,
+        payment_id,
         order_id,
         payment_method,
         amount
@@ -45,7 +44,6 @@ final as (
         orders.order_id,
         orders.customer_id,
         orders.order_date,
-        orders.status,
 
         {% for payment_method in payment_methods -%}
 

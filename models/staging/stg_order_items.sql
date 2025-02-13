@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from "jaffle_shop".public.items
+    select * from {{ source('jaffle_shop', 'items') }}
 
 ),
 

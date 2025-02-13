@@ -27,6 +27,6 @@ models:
     relation: true
     columns: true
   jaffle_shop:
-      materialized: table
+      materialized: view
       staging:
         materialized: view
