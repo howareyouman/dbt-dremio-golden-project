@@ -1,9 +1,9 @@
 with customers as (
 
     select
-        id as customer_id,
-        split_part(name, ' ', 1) as first_name,
-        split_part(name, ' ', 2) as last_name
+        customer_id,
+        split_part(customer_name, ' ', 1) as first_name,
+        split_part(customer_name, ' ', 2) as last_name
     from {{ ref('stg_customers') }}
 
 ),
@@ -11,8 +11,8 @@ with customers as (
 orders as (
 
     select
-        id as order_id,
-        customer as customer_id,
+        order_id,
+        customer_id,
         ordered_at as order_date
     from {{ ref('stg_orders') }}
 
@@ -21,7 +21,7 @@ orders as (
 payments as (
 
     select
-        id as payment_id,
+        payment_id,
         order_id,
         amount
     from {{ ref('stg_payments') }}
