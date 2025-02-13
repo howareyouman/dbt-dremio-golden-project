@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS orders (
 -- Create table for raw_payments.csv
 CREATE TABLE IF NOT EXISTS payments (
     id SERIAL PRIMARY KEY,
-    order_id INT,
+    order_id VARCHAR(50),
     payment_method VARCHAR(50),
     amount DECIMAL(10, 2)
 );
