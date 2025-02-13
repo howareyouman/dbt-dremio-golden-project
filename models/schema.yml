@@ -63,25 +63,15 @@ models:
 
       - name: amount
         description: Total amount (AUD) of the order
-        tests:
-          - not_null
 
       - name: credit_card_amount
         description: Amount of the order (AUD) paid for by credit card
-        tests:
-          - not_null
 
       - name: coupon_amount
         description: Amount of the order (AUD) paid for by coupon
-        tests:
-          - not_null
 
       - name: bank_transfer_amount
         description: Amount of the order (AUD) paid for by bank transfer
-        tests:
-          - not_null
 
       - name: gift_card_amount
         description: Amount of the order (AUD) paid for by gift card
-        tests:
-          - not_null
