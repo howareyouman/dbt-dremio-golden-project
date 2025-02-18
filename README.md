@@ -13,3 +13,7 @@ DBT project will live inside dbt container and Dremio will be available on local
 How to connect to dbt container:
 
 ```docker exec -it dbt /bin/bash```
+
+The only needed dbt command to run this project is:
+
+```dbt build```
