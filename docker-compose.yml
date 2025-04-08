@@ -47,7 +47,7 @@ services:
     - 45678:45678
     container_name: dremio-analytics
     environment:
-    - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist -Ddebug.addDefaultUser=true
+    - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist -Ddremio.log.path=/var/log/dremio -Ddebug.addDefaultUser=true
     - DREMIO_MAX_MEMORY_SIZE_MB=4096
     - DREMIO_MAX_DIRECT_MEMORY_SIZE_MB=4096
     - SERVICES_COORDINATOR_ENABLED=true
